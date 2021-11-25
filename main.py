@@ -205,17 +205,17 @@ def main(args):
     else:
       checkpoint = load_checkpoint(args.resume)
       model.load_state_dict(checkpoint['state_dict'])
-
-    # compatibility with the epoch-wise evaluation version
-    if 'epoch' in checkpoint.keys():
-      start_epoch = checkpoint['epoch']
-    else:
-      start_iters = checkpoint['iters']
-      start_epoch = int(start_iters // len(train_loader)) if not args.evaluate else 0
-    best_res = checkpoint['best_res']
-    if not args.evaluate:
-      print("=> Start epoch", start_epoch)
-      print("=> Start iters {}  best res {:.1%}".format(start_iters, best_res))
+      
+      # compatibility with the epoch-wise evaluation version
+      if 'epoch' in checkpoint.keys():
+        start_epoch = checkpoint['epoch']
+      else:
+        start_iters = checkpoint['iters']
+        start_epoch = int(start_iters // len(train_loader)) if not args.evaluate else 0
+      best_res = checkpoint['best_res']
+      if not args.evaluate:
+        print("=> Start epoch", start_epoch)
+        print("=> Start iters {}  best res {:.1%}".format(start_iters, best_res))
   
   if args.cuda:
     device = torch.device("cuda")

@@ -69,9 +69,13 @@ class TFLogger(object):
 
   def scalar_summary(self, tag, value, step):
     """Log a scalar variable."""
-    summary = tf.Summary(value=[tf.Summary.Value(tag=tag, simple_value=value)])
-    self.writer.add_summary(summary, step)
-    self.writer.flush()
+    with self.writer.as_default():
+      tf.summary.scalar(tag, value, step=step)
+      self.writer.flush()
+
+    # summary = tf.Summary(value=[tf.Summary.Value(tag=tag, simple_value=value)])
+    # self.writer.add_summary(summary, step)
+    # self.writer.flush()
 
   def image_summary(self, tag, images, step):
     """Log a list of images."""
@@ -86,16 +90,23 @@ class TFLogger(object):
       scipy.misc.toimage(img).save(s, format="png")
 
       # Create an Image object
-      img_sum = tf.Summary.Image(encoded_image_string=s.getvalue(),
+      img_sum = tf.summary.image(encoded_image_string=s.getvalue(),
                                  height=img.shape[0],
                                  width=img.shape[1])
+      # img_sum = tf.Summary.Image(encoded_image_string=s.getvalue(),
+      #                            height=img.shape[0],
+      #                            width=img.shape[1])
       # Create a Summary value
-      img_summaries.append(tf.Summary.Value(tag='%s/%d' % (tag, i), image=img_sum))
+      img_summaries.append(tf.summary.scalar(tag='%s/%d' % (tag, i), image=img_sum))
+
+      #img_summaries.append(tf.Summary.Value(tag='%s/%d' % (tag, i), image=img_sum))
 
     # Create and write Summary
-    summary = tf.Summary(value=img_summaries)
-    self.writer.add_summary(summary, step)
+    summary = tf.summary.image(value=img_summaries,step=step)
     self.writer.flush()
+    # summary = tf.Summary(value=img_summaries)
+    # self.writer.add_summary(summary, step)
+    # self.writer.flush()
         
   def histo_summary(self, tag, values, step, bins=1000):
     """Log a histogram of the tensor of values."""
@@ -121,9 +132,11 @@ class TFLogger(object):
       hist.bucket.append(c)
 
     # Create and write Summary
-    summary = tf.Summary(value=[tf.Summary.Value(tag=tag, histo=hist)])
-    self.writer.add_summary(summary, step)
+    tf.summary.histogram(tag = tag, histo = hist , step=step)
     self.writer.flush()
+    # summary = tf.Summary(value=[tf.Summary.Value(tag=tag, histo=hist)])
+    # self.writer.add_summary(summary, step)
+    # self.writer.flush()
 
   def close(self):
     self.writer.close()

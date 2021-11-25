@@ -181,6 +181,24 @@ def main(args):
   start_iters = 0
   if args.resume:
     checkpoint = load_checkpoint(args.resume)
+    #model.load_state_dict(checkpoint['state_dict'])
+    model_state_dict = model.state_dict()
+    is_changed = False
+    for k in checkpoint:
+      if k in model_state_dict:
+        if checkpoint[k].shape != model_state_dict[k].shape:
+          print(f"Skip loading parameter: {k}, "
+                      f"required shape: {model_state_dict[k].shape}, "
+                      f"loaded shape: {checkpoint[k].shape}")
+          checkpoint[k] = model_state_dict[k]
+          is_changed = True
+      else:
+        print(f"Dropping parameter {k}")
+        is_changed = True
+
+    if is_changed:
+      checkpoint.pop("optimizer_states", None)
+      
     model.load_state_dict(checkpoint['state_dict'])
 
     # compatibility with the epoch-wise evaluation version

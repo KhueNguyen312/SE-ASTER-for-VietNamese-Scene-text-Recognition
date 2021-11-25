@@ -72,7 +72,7 @@ def get_data_lmdb(data_dir, voc_type, max_len, num_samples, height, width, batch
   if is_train:
     data_loader = DataLoader(dataset, batch_size=batch_size, num_workers=workers,
       shuffle=True, pin_memory=True, drop_last=True,
-      collate_fn=AlignCollate(imgH=height, imgW=width, keep_ratio=keep_ratio))
+      collate_fn=AlignCollate(imgH=height, imgW=width, keep_ratio=keep_ratio), generator=torch.Generator(device='cuda'))
   else:
     data_loader = DataLoader(dataset, batch_size=batch_size, num_workers=workers,
       shuffle=False, pin_memory=True, drop_last=False,
@@ -200,12 +200,11 @@ def main(args):
       if is_changed:
         checkpoint.pop("optimizer_states", None)
 
-      checkpoint['iters'] = 0
       model.load_state_dict(checkpoint)
     else:
       checkpoint = load_checkpoint(args.resume)
       model.load_state_dict(checkpoint['state_dict'])
-      
+
       # compatibility with the epoch-wise evaluation version
       if 'epoch' in checkpoint.keys():
         start_epoch = checkpoint['epoch']

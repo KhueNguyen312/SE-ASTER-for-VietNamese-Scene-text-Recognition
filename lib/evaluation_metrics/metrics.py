@@ -12,7 +12,8 @@ from ..utils import to_torch, to_numpy
 
 
 def _normalize_text(text):
-  text = ''.join(filter(lambda x: x in (string.digits + string.ascii_letters), text))
+  vi_characters = 'àÀảẢãÃáÁạẠăĂằẰẳẲẵẴắẮặẶâÂầẦẩẨẫẪấẤậẬđĐèÈẻẺẽẼéÉẹẸêÊềỀểỂễỄếẾệỆìÌỉỈĩĨíÍịỊòÒỏỎõÕóÓọỌôÔồỒổỔỗỖốỐộỘơƠờỜởỞỡỠớỚợỢùÙủỦũŨúÚụỤưƯừỪửỬữỮứỨựỰỳỲỷỶỹỸýÝỵỴ'
+  text = ''.join(filter(lambda x: x in (string.digits + string.ascii_letters + vi_characters), text))
   return text.lower()
 
 

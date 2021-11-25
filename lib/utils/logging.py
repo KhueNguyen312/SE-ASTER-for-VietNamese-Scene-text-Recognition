@@ -65,7 +65,7 @@ class TFLogger(object):
     """Create a summary writer logging to log_dir."""
     if log_dir is not None:
       mkdir_if_missing(log_dir)
-    self.writer = tf.summary.FileWriter(log_dir)
+    self.writer = tf.summary.create_file_writer(log_dir)
 
   def scalar_summary(self, tag, value, step):
     """Log a scalar variable."""

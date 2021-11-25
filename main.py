@@ -180,26 +180,31 @@ def main(args):
   start_epoch = 0
   start_iters = 0
   if args.resume:
-    checkpoint = load_checkpoint(args.resume)
-    #model.load_state_dict(checkpoint['state_dict'])
-    model_state_dict = model.state_dict()
-    is_changed = False
-    for k in checkpoint:
-      if k in model_state_dict:
-        if checkpoint[k].shape != model_state_dict[k].shape:
-          print(f"Skip loading parameter: {k}, "
-                      f"required shape: {model_state_dict[k].shape}, "
-                      f"loaded shape: {checkpoint[k].shape}")
-          checkpoint[k] = model_state_dict[k]
+    if args.load_mismatch:
+      checkpoint = load_checkpoint(args.resume)['state_dict']
+      #model.load_state_dict(checkpoint['state_dict'])
+      model_state_dict = model.state_dict()
+      is_changed = False
+      for k in checkpoint:
+        if k in model_state_dict:
+          if checkpoint[k].shape != model_state_dict[k].shape:
+            print(f"Skip loading parameter: {k}, "
+                        f"required shape: {model_state_dict[k].shape}, "
+                        f"loaded shape: {checkpoint[k].shape}")
+            checkpoint[k] = model_state_dict[k]
+            is_changed = True
+        else:
+          print(f"Dropping parameter {k}")
           is_changed = True
-      else:
-        print(f"Dropping parameter {k}")
-        is_changed = True
 
-    if is_changed:
-      checkpoint.pop("optimizer_states", None)
-      
-    model.load_state_dict(checkpoint['state_dict'])
+      if is_changed:
+        checkpoint.pop("optimizer_states", None)
+
+      checkpoint['iters'] = 0
+      model.load_state_dict(checkpoint)
+    else:
+      checkpoint = load_checkpoint(args.resume)
+      model.load_state_dict(checkpoint['state_dict'])
 
     # compatibility with the epoch-wise evaluation version
     if 'epoch' in checkpoint.keys():

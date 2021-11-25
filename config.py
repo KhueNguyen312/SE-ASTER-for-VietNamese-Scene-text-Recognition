@@ -73,7 +73,8 @@ parser.add_argument('--start_save', type=int, default=0,
 parser.add_argument('--seed', type=int, default=1)
 parser.add_argument('--print_freq', type=int, default=100)
 parser.add_argument('--cuda', default=True, type=bool,
-                    help='whether use cuda support.')
+                    help='whether use cuda support.'),
+parser.add_argument('--load_mismatch', type=bool, default=False) #cho phép model load mismatch
 # testing configs
 parser.add_argument('--evaluation_metric', type=str, default='accuracy')
 parser.add_argument('--evaluate_with_lexicon', action='store_true', default=False)
